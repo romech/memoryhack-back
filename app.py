@@ -4,16 +4,18 @@ import time
 import uuid
 
 from flask import Flask
+from flask import Response
 from flask import abort
 from flask import request
 from flask import send_file
 from flask import send_from_directory
 from flask import url_for
 from flask_cors import CORS, cross_origin
+import requests
 
 import task_queue
 
-HOST = 'https://deoldify-a53b371c.localhost.run'
+HOST = 'https://deoldify-044f6348.localhost.run'
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -58,6 +60,25 @@ def deoldify():
             abort(500, 'Unable to process request')
         else:
             time.sleep(0.5)
+
+
+@app.route('/reenact', methods=['POST'])
+@cross_origin()
+def reenact():
+    resp = requests.request(
+        method=request.method,
+        url='104.211.46.237:5000/reenact',
+        headers={key: value for (key, value) in request.headers if key != 'Host'},
+        data=request.get_data(),
+        cookies=request.cookies,
+        allow_redirects=False)
+
+    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+    headers = [(name, value) for (name, value) in resp.raw.headers.items()
+               if name.lower() not in excluded_headers]
+
+    response = Response(resp.content, resp.status_code, headers)
+    return response
 
 
 def _get_extension(filename):
