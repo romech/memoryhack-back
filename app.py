@@ -67,7 +67,7 @@ def deoldify():
 def reenact():
     resp = requests.request(
         method=request.method,
-        url='104.211.46.237:5000/reenact',
+        url='http://104.211.46.237:5000/reenact',
         headers={key: value for (key, value) in request.headers if key != 'Host'},
         data=request.get_data(),
         cookies=request.cookies,
